@@ -10,8 +10,13 @@ const Page = () => {
       {/* Overlay to darken background */}
       <div className="absolute inset-0 bg-black bg-opacity-60"></div>
 
+      {/* Outer Glow Effect */}
+      <div className="absolute inset-0 flex justify-center items-center z-0">
+        <div className="rounded-xl w-96 h-96 bg-gradient-to-r from-orange-400 via-yellow-500 to-orange-400 opacity-20 blur-3xl"></div>
+      </div>
+
       {/* Login Form Container */}
-      <div className="relative bg-white shadow-2xl rounded-xl p-8 w-96 border border-gray-200">
+      <div className="relative bg-white shadow-2xl rounded-xl p-8 w-96 border border-gray-200 z-10">
         <h1 className="text-3xl font-extrabold text-center text-gray-800 mb-6">
           Login to <span className="text-orange-500">B2W</span>
         </h1>
@@ -52,11 +57,6 @@ const Page = () => {
             Login
           </button>
         </form>
-      </div>
-
-      {/* Outer Glow Effect */}
-      <div className="absolute inset-0 flex justify-center items-center">
-        <div className="rounded-xl w-96 h-96 bg-gradient-to-r from-orange-400 via-yellow-500 to-orange-400 opacity-20 blur-3xl"></div>
       </div>
     </div>
   );
