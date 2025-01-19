@@ -1,26 +1,32 @@
 from flask import Flask, request, jsonify
-import psycopg2
+from flask_cors import CORS  # Import CORS
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 from datetime import datetime, timedelta
+from sqlalchemy import create_engine
 
 app = Flask(__name__)
+CORS(app)
 
 # Database connection settings
 DB_CONFIG = {
     "dbname": "postgres",
     "user": "postgres",
-    "password": "helloworld123",
+    "password": "ahmedthe23",
     "host": "localhost", 
     "port": 5432
 }
 
-# Connect to PostgreSQL
+# Create SQLAlchemy engine
+def get_engine():
+    connection_string = f"postgresql+psycopg2://{DB_CONFIG['user']}:{DB_CONFIG['password']}@{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['dbname']}"
+    return create_engine(connection_string)
+
+# Fetch data using SQLAlchemy engine
 def fetch_data(query):
     try:
-        conn = psycopg2.connect(**DB_CONFIG)
-        df = pd.read_sql(query, conn)
-        conn.close()
+        engine = get_engine()
+        df = pd.read_sql(query, engine)
         return df
     except Exception as e:
         return {"error": str(e)}
@@ -98,5 +104,17 @@ def insights():
 
     return jsonify(insights)
 
+# New endpoint for goals
+@app.route('/goals', methods=['GET'])
+def get_goals():
+    # Fetch goals data
+    query = "SELECT * FROM goals"
+    goals_data = fetch_data(query)
+
+    if "error" in goals_data:
+        return jsonify({"error": goals_data["error"]}), 500
+    
+    return jsonify(goals_data)
+
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5001)
+    app.run(host="127.0.0.1", port=5001)
