@@ -114,7 +114,11 @@ def get_goals():
     if "error" in goals_data:
         return jsonify({"error": goals_data["error"]}), 500
     
-    return jsonify(goals_data)
+    # Convert DataFrame to a list of dictionaries
+    goals_data_list = goals_data.to_dict(orient='records')
+    
+    return jsonify(goals_data_list)
+
 
 if __name__ == '__main__':
     app.run(host="127.0.0.1", port=5001)
