@@ -12,6 +12,7 @@
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "config": "^3.3.12",
+    "cors": "^2.8.5",
     "express": "^4.21.2",
     "express-validator": "^7.2.1",
     "gravatar": "^1.8.2",

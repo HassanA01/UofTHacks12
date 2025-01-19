@@ -1,32 +1,30 @@
 'use client';
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation'; // Import useRouter
 import Link from 'next/link';
 
 const Page = () => {
-  // State for the form inputs
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState(''); // State for error messages
-  const [success, setSuccess] = useState(''); // State for success messages
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const router = useRouter(); // Initialize router
 
-  // Function to handle form submission
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent form from refreshing the page
+    e.preventDefault();
 
-    // Check if passwords match
     if (password !== confirmPassword) {
-      setError('Passwords do not match'); // Set error message
+      setError('Passwords do not match');
       return;
     }
 
-    setError(''); // Clear error message if valid
+    setError('');
     setSuccess('');
 
     try {
-      // API call to register the user
-      const response = await fetch('/api/users', {
+      const response = await fetch('http://localhost:5000/api/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -37,13 +35,15 @@ const Page = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setSuccess('Account created successfully! You can now log in.');
+        setSuccess('Account created successfully!');
         setName('');
         setEmail('');
         setPassword('');
         setConfirmPassword('');
+
+        // Redirect to login page
+        router.push('/login');
       } else {
-        // Handle API errors
         setError(data.errors?.[0]?.msg || 'Something went wrong. Please try again.');
       }
     } catch (err) {
@@ -67,7 +67,6 @@ const Page = () => {
           Signup For <span className="text-orange-500">B2W</span>
         </h1>
         <form onSubmit={handleSubmit}>
-          {/* Name Field */}
           <div className="mb-4">
             <label htmlFor="name" className="block text-gray-700 font-medium mb-2">
               Name
@@ -82,8 +81,6 @@ const Page = () => {
               required
             />
           </div>
-
-          {/* Email Field */}
           <div className="mb-4">
             <label htmlFor="email" className="block text-gray-700 font-medium mb-2">
               Email
@@ -98,8 +95,6 @@ const Page = () => {
               required
             />
           </div>
-
-          {/* Password Field */}
           <div className="mb-4">
             <label htmlFor="password" className="block text-gray-700 font-medium mb-2">
               Password
@@ -114,8 +109,6 @@ const Page = () => {
               required
             />
           </div>
-
-          {/* Confirm Password Field */}
           <div className="mb-4">
             <label htmlFor="confirmPassword" className="block text-gray-700 font-medium mb-2">
               Confirm Password
@@ -130,19 +123,13 @@ const Page = () => {
               required
             />
           </div>
-
-          {/* Error Message */}
           {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-          {/* Success Message */}
           {success && <p className="text-green-500 text-sm mb-4">{success}</p>}
-
           <div className="text-center mb-4">
             <h2>
               Already have an account? <Link href="/login">Login</Link>
             </h2>
           </div>
-
-          {/* Signup Button */}
           <button
             type="submit"
             className="w-full py-3 bg-gradient-to-r from-orange-500 to-yellow-500 text-white font-bold rounded-lg shadow-lg hover:from-orange-600 hover:to-yellow-600 transition duration-300"
