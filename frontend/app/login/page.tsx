@@ -1,5 +1,6 @@
 import background from '@/public/background.png';
 import React from 'react';
+import Link from 'next/link';
 
 const Page = () => {
   return (
@@ -45,6 +46,10 @@ const Page = () => {
               placeholder="Enter your password"
               required
             />
+          </div>
+
+          <div className="text-center">
+              <h2>Don't have an account? <Link href="/signup"> Sign up </Link></h2>
           </div>
 
           {/* Login Button */}
