@@ -4,11 +4,9 @@ import React from 'react';
 const Page = () => {
   return (
     <div
-      className="h-screen bg-cover bg-center relative flex justify-center items-center"
-      style={{ backgroundImage: `url(${background.src})` }}
-    >
-      {/* Overlay to darken background */}
-      <div className="absolute inset-0 bg-black bg-opacity-60"></div>
+    className='flex h-screen justify-center items-center bg-gradient-to-br from-custom-black via-custom-black to-custom-yellow'>
+   {/* Reduced negative gap */}
+
 
       {/* Outer Glow Effect */}
       <div className="absolute inset-0 flex justify-center items-center z-0">
