@@ -6,7 +6,7 @@ export default function Hero() {
   const router = useRouter();
 
   const handlePlayClick = () => {
-    router.push('/login');
+    router.push('/mrkrabs');
   };
 
   return (

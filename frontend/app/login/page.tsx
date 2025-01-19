@@ -28,7 +28,7 @@ const Page = () => {
 
       if (response.ok) {
         // Redirect to /mrkrabs on successful login
-        router.push('/mrkrabs');
+        router.push('/main');
       } else {
         // Handle API errors
         setError(data.errors?.[0]?.msg || 'Invalid email or password.');
