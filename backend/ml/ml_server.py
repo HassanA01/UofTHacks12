@@ -8,7 +8,7 @@ from sqlalchemy import create_engine
 app = Flask(__name__)
 CORS(app)
 
-# Database connection settings
+# Database connection settings (this part is still needed even if we're mocking data)
 DB_CONFIG = {
     "dbname": "postgres",
     "user": "postgres",
@@ -17,21 +17,23 @@ DB_CONFIG = {
     "port": 5432
 }
 
-# Create SQLAlchemy engine
-def get_engine():
-    connection_string = f"postgresql+psycopg2://{DB_CONFIG['user']}:{DB_CONFIG['password']}@{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['dbname']}"
-    return create_engine(connection_string)
+# Mocked data for goals
+mock_goals = pd.DataFrame({
+    "user_id": [1, 2],
+    "goal_name": ["Goal 1", "Goal 2"],
+    "target_amount": [1000, 1500],
+    "current_savings": [200, 500],
+    "deadline": [datetime.now() + timedelta(days=30), datetime.now() + timedelta(days=60)]
+})
 
-# Fetch data using SQLAlchemy engine
-def fetch_data(query):
-    try:
-        engine = get_engine()
-        df = pd.read_sql(query, engine)
-        return df
-    except Exception as e:
-        return {"error": str(e)}
+# Mocked data for transactions
+mock_transactions = pd.DataFrame({
+    "user_id": [1, 1, 2],
+    "category": ["Food", "Transport", "Food"],
+    "total_spent": [300, 150, 400]
+})
 
-# Train the regression model
+# Train the regression model (no change here, just uses mock data)
 def train_model(data):
     X = data[["month"]]
     y = data["total_spent"]
@@ -42,22 +44,14 @@ def train_model(data):
 # Endpoint for future predictions
 @app.route('/predict', methods=['POST'])  # Changed to GET
 def predict():
-    # Fetch historical data from PostgreSQL
-    query = """
-        SELECT 
-            EXTRACT(MONTH FROM transaction_date) AS month,
-            SUM(amount) AS total_spent
-        FROM transactions
-        GROUP BY EXTRACT(MONTH FROM transaction_date)
-        ORDER BY month
-    """
-    data = fetch_data(query)
-
-    if "error" in data:
-        return jsonify({"error": data["error"]}), 500
+    # Mocked historical data for predictions
+    mock_data = pd.DataFrame({
+        "month": [1, 2, 3, 4, 5],
+        "total_spent": [200, 300, 250, 400, 350]
+    })
 
     # Train model
-    model = train_model(data)
+    model = train_model(mock_data)
 
     # Predict next month's spending
     current_month = datetime.now().month
@@ -67,57 +61,44 @@ def predict():
     prediction = next_month.to_dict(orient="records")[0]
     return jsonify(prediction)
 
-# Endpoint for insights
+# Endpoint for insights using mocked data
 @app.route('/insights', methods=['GET'])
 def insights():
-    # Fetch goals and transactions data
-    goals_query = "SELECT * FROM goals"
-    transactions_query = """
-        SELECT 
-            user_id, category, SUM(amount) AS total_spent
-        FROM transactions
-        GROUP BY user_id, category
-    """
-    goals = fetch_data(goals_query)
-    transactions = fetch_data(transactions_query)
-
-    if "error" in goals or "error" in transactions:
-        return jsonify({"error": goals.get("error", transactions.get("error"))}), 500
-
-    # Generate savings insights
+    # Use mocked goals and transactions data
     insights = []
-    for _, goal in goals.iterrows():
-        user_transactions = transactions[transactions["user_id"] == goal["user_id"]]
+    for _, goal in mock_goals.iterrows():
+        user_transactions = mock_transactions[mock_transactions["user_id"] == goal["user_id"]]
         total_spent = user_transactions["total_spent"].sum()
 
         # Calculate required savings rate
-        days_to_deadline = (goal["deadline"] - datetime.now().date()).days
+        days_to_deadline = (goal["deadline"] - datetime.now()).days
         required_savings_rate = (goal["target_amount"] - goal["current_savings"]) / days_to_deadline
 
+        # Include user name and better format the data
+        user_name = f"User {goal['user_id']}"
+
         insights.append({
-            "user_id": goal["user_id"],
+            "user_name": user_name,
             "goal_name": goal["goal_name"],
             "target_amount": goal["target_amount"],
+            "current_savings": goal["current_savings"],
             "required_savings_rate": round(required_savings_rate, 2),
-            "avg_monthly_spent": round(total_spent / len(user_transactions), 2)
+            "avg_monthly_spent": round(total_spent / len(user_transactions), 2) if len(user_transactions) > 0 else 0
         })
 
     return jsonify(insights)
 
-# New endpoint for goals
+
+# New endpoint for goals using mocked data
 @app.route('/goals', methods=['GET'])
 def get_goals():
-    # Fetch goals data
-    query = "SELECT * FROM goals"
-    goals_data = fetch_data(query)
-
-    if "error" in goals_data:
-        return jsonify({"error": goals_data["error"]}), 500
-    
-    # Convert DataFrame to a list of dictionaries
-    goals_data_list = goals_data.to_dict(orient='records')
-    
+    # Use mocked goals data
+    goals_data_list = mock_goals.to_dict(orient='records')
+    # Formatting to make sure the data is easy to present
+    for goal in goals_data_list:
+        goal['days_left'] = (goal['deadline'] - datetime.now()).days
     return jsonify(goals_data_list)
+
 
 
 if __name__ == '__main__':
