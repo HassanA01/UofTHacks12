@@ -7,24 +7,38 @@ const Page = () => {
   const router = useRouter();
   const [insightsData, setInsightsData] = useState(null);
   const [goalsData, setGoalsData] = useState(null);
+  const [loadingInsights, setLoadingInsights] = useState(false);
+  const [loadingGoals, setLoadingGoals] = useState(false);
+  const [errorInsights, setErrorInsights] = useState<string | null>(null);
+  const [errorGoals, setErrorGoals] = useState<string | null>(null);
 
   // Function to handle the API request for insights
   const fetchInsights = async () => {
+    setLoadingInsights(true);
+    setErrorInsights(null);
     try {
-      const response = await axios.get('http://localhost:5001/insights'); // Make sure the backend server is running
+      const response = await axios.get('http://localhost:5001/insights');
       setInsightsData(response.data);
     } catch (error) {
+      setErrorInsights("Error fetching insights");
       console.error("Error fetching insights:", error);
+    } finally {
+      setLoadingInsights(false);
     }
   };
 
   // Function to handle the API request for goals
   const fetchGoals = async () => {
+    setLoadingGoals(true);
+    setErrorGoals(null);
     try {
-      const response = await axios.get('http://localhost:5001/goals'); // Make sure the backend server is running
+      const response = await axios.get('http://localhost:5001/goals');
       setGoalsData(response.data);
     } catch (error) {
+      setErrorGoals("Error fetching goals");
       console.error("Error fetching goals:", error);
+    } finally {
+      setLoadingGoals(false);
     }
   };
 
@@ -62,7 +76,11 @@ const Page = () => {
         >
           <h2 className="text-white text-2xl font-bold text-center w-full">Insights</h2>
           {/* Display insights data */}
-          {insightsData ? (
+          {loadingInsights ? (
+            <div className="text-white mt-4">Loading insights...</div>
+          ) : errorInsights ? (
+            <div className="text-white mt-4">{errorInsights}</div>
+          ) : insightsData ? (
             <div className="text-white mt-4">
               <pre>{JSON.stringify(insightsData, null, 2)}</pre> {/* Displaying the response */}
             </div>
@@ -78,7 +96,11 @@ const Page = () => {
         >
           <h2 className="text-white text-2xl font-bold text-center w-full">Goals</h2>
           {/* Display goals data */}
-          {goalsData ? (
+          {loadingGoals ? (
+            <div className="text-white mt-4">Loading goals...</div>
+          ) : errorGoals ? (
+            <div className="text-white mt-4">{errorGoals}</div>
+          ) : goalsData ? (
             <div className="text-white mt-4">
               <pre>{JSON.stringify(goalsData, null, 2)}</pre> {/* Displaying the response */}
             </div>
