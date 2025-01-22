@@ -10,7 +10,7 @@
 
 Frontend:  
  **React.js**: A JavaScript library for building user interfaces.  
- **Bootstrap**: A CSS framework for developing responsive and mobile-first websites.
+ **Tailwind CSS**: A CSS framework for developing responsive and mobile-first websites.
 
 Backend:  
 **Express.js**: A web application framework for Node.js.  
